@@ -131,11 +131,6 @@ view: cubo_final {
     sql: ${TABLE}.zScore ;;
   }
 
-  measure: count {
-    type: count
-   drill_fields: []
-  }
-
   dimension: UOM {
   type: number
     sql: CASE
@@ -145,4 +140,121 @@ view: cubo_final {
             WHEN ${TABLE}.UOM = 'COGS' THEN ${TABLE}.COG
         END ;;
   }
+  dimension: AbsVar {
+    type: number
+    sql: CASE
+            WHEN ${TABLE}.Measure = 'AbsVar' THEN ${TABLE}.UOM
+            ELSE '0'
+         END ;;
+  }
+  dimension: Arrivals {
+    type: number
+    sql: CASE
+            WHEN ${TABLE}.Measure = 'ActualArrivals' THEN ${TABLE}.UOM
+            ELSE '0'
+         END ;;
+  }
+  dimension: CSOH {
+    type: number
+    sql: CASE
+            WHEN ${TABLE}.Measure = 'CSOH' OR  ${TABLE}.Measure = 'PSOH' THEN ${TABLE}.UOM
+            ELSE '0'
+         END ;;
+  }
+  dimension: Dimension {
+    type: string
+    sql: CASE
+            WHEN ${TABLE}.Dimension = 'Brand' THEN ${TABLE}.Brand
+            WHEN ${TABLE}.Dimension = 'Status' THEN ${TABLE}.Status
+            WHEN ${TABLE}.Dimension = 'Model' THEN ${TABLE}.Model
+            WHEN ${TABLE}.Dimension = 'Description' THEN ${TABLE}.Description
+         END ;;
+  }
+  dimension: Dmd_Plan {
+    type: number
+    sql: CASE
+            WHEN ${TABLE}.Measure = 'SalesForecast' THEN ${TABLE}.UOM
+            ELSE '0'
+         END ;;
+  }
+  dimension: LagAbsVar {
+    type: number
+    sql: CASE
+            WHEN ${TABLE}.UOM = 'Unidades' THEN ${TABLE}.Value
+            WHEN ${TABLE}.UOM = 'Revenue' THEN ${TABLE}.Revenue
+            WHEN ${TABLE}.UOM = 'Profit' THEN ${TABLE}.GrossProfit
+            WHEN ${TABLE}.UOM = 'COGS' THEN ${TABLE}.COG
+        END ;;
+  }
+  dimension: Max {
+    type: number
+    sql: CASE
+            WHEN ${TABLE}.Measure = 'Max' THEN ${TABLE}.UOM
+            ELSE '0'
+         END ;;
+  }
+  dimension: Min {
+    type: number
+    sql: CASE
+            WHEN ${TABLE}.Measure = 'Min' THEN ${TABLE}.UOM
+            ELSE '0'
+         END ;;
+  }
+  dimension: Sell_In {
+    type: number
+    sql: CASE
+            WHEN ${TABLE}.Measure = 'Sell_In' THEN ${TABLE}.UOM
+            ELSE '0'
+         END ;;
+  }
+  dimension: Sell_Out {
+    type: number
+    sql: CASE
+            WHEN ${TABLE}.Measure = 'Sell_Out' THEN ${TABLE}.UOM
+            ELSE '0'
+         END ;;
+  }
+  dimension: Stat_FC {
+    type: number
+    sql: CASE
+            WHEN ${TABLE}.Measure = 'Forecast' THEN ${TABLE}.UOM
+            ELSE '0'
+         END ;;
+  }
+  dimension: Target {
+    type: number
+    sql: CASE
+            WHEN ${TABLE}.Measure = 'Target' THEN ${TABLE}.UOM
+            ELSE '0'
+         END ;;
+  }
+  measure: count {
+    type: count
+    drill_fields: []
+  }
+
+  measure: Acc_Zero_Lag {
+    type: number
+    sql: 1.0 - (COALESCE(SUM(${TABLE}.AbsVar), 0) / COALESCE(SUM(${TABLE}.Stat_FC), 0));;
+  }
+  measure: WOH {
+    type: number
+    sql: COALESCE(SUM(${TABLE}.CSOH), 0) / COALESCE(SUM(${TABLE}.Stat_FC), 0);;
+  }
+  measure: Var_Zero_Lag {
+    type: number
+    sql: COALESCE(SUM(${TABLE}.Stat_FC), 0) - COALESCE(SUM(${TABLE}.Sell_Out), 0);;
+  }
+  measure: Mkt_Intel {
+    type: number
+    sql: COALESCE(SUM(${TABLE}.Dmd_Plan), 0) - COALESCE(SUM(${TABLE}.Stat_FC), 0);;
+  }
+  measure: Bias_Zero_Lag {
+    type: number
+    sql: COALESCE(${Var_Zero_Lag}, 0) / COALESCE(SUM(${TABLE}.Stat_FC), 0);;
+  }
+
+
+
+
 }
