@@ -131,6 +131,16 @@ view: cubo_final {
     sql: ${TABLE}.zScore ;;
   }
 
+  dimension: UOM {
+    type: string
+    sql: CASE columna
+         WHEN Unidades THEN 'Unidades'
+         WHEN Revenue THEN 'Revenue'
+         WHEN Profit THEN 'Profit'
+         ELSE 'COGS'
+       END ;;
+  }
+
   measure: count {
     type: count
     drill_fields: []
