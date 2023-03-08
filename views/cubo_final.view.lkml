@@ -133,6 +133,16 @@ view: cubo_final {
 
   measure: count {
     type: count
-    drill_fields: []
+   drill_fields: []
+  }
+
+  dimension: UOM {
+  type: number
+    sql: CASE
+            WHEN ${TABLE}.UOM = 'Unidades' THEN ${TABLE}.Value
+            WHEN ${TABLE}.UOM = 'Revenue' THEN ${TABLE}.Revenue
+            WHEN ${TABLE}.UOM = 'Profit' THEN ${TABLE}.GrossProfit
+            WHEN ${TABLE}.UOM = 'COGS' THEN ${TABLE}.COG
+        END ;;
   }
 }
