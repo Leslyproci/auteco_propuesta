@@ -147,14 +147,33 @@ view: cubo_final {
     sql: ${TABLE}.zScore ;;
   }
 
+  parameter: UOM_filtro {
+    type: unquoted
+    allowed_value: {
+      value: "Unidades"
+    }
+    allowed_value: {
+      value: "Revenue"
+    }
+    allowed_value: {
+      value: "Profit"
+    }
+    allowed_value: {
+      value: "COGS"
+    }
+  }
+
   dimension: UOM {
-    type: number
-    sql: CASE
-            WHEN ${TABLE}.UOM = 'Unidades' THEN ${TABLE}.Value
-            WHEN ${TABLE}.UOM = 'Revenue' THEN ${TABLE}.Revenue
-            WHEN ${TABLE}.UOM = 'Profit' THEN ${TABLE}.GrossProfit
-            WHEN ${TABLE}.UOM = 'COGS' THEN ${TABLE}.COG
-        END ;;
+    sql:
+    {% if UOM_filtro._parameter_value == 'Unidades' %}
+      ${TABLE}.Value
+    {% elsif UOM_filtro._parameter_value == 'Revenue' %}
+      ${TABLE}.Revenue
+    {% elsif UOM_filtro._parameter_value == 'Profit' %}
+      ${TABLE}.GrossProfit
+    {% elsif UOM_filtro._parameter_value == 'COGS' %}
+      ${TABLE}.COG
+    {% endif %};;
   }
   dimension: AbsVar {
     type: number
@@ -196,7 +215,7 @@ view: cubo_final {
     }
   }
 
-  dimension: Dimension_1 {
+  dimension: Dimension {
     sql:
     {% if Dimension_filtro._parameter_value == 'Brand' %}
       ${TABLE}.Brand
